@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cuestionario del mural</title>
+<meta name="theme-color" content="#1a2a8f">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=DM+Sans:wght@400;500&display=swap">
+<style>
+/* Layout: una pregunta por pantalla en una columna angosta y centrada, sobre un degradado azul y morado con halos de luz. */
+:root {
+  --bg-base: #1a1a7a;
+  --bg-top: #1a2a8f;
+  --bg-mid: #2b1f8f;
+  --bg-bottom: #4a1c8c;
+  --glow-blue: #5b7cff;
+  --glow-violet: #b478ff;
+  --ink: #f5f3ff;
+  --ink-soft: rgba(245, 243, 255, 0.78);
+  --line: rgba(255, 255, 255, 0.3);
+  --accent: #d9ccff;
+  --btn-bg: #f5f3ff;
+  --btn-ink: #1c1560;
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  background-color: var(--bg-base);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color: transparent;
+}
+::selection { background: rgba(217, 204, 255, 0.35); }
+
+/* Fondo */
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 55% at 50% 0%, rgba(160, 182, 255, 0.38), transparent 62%),
+    linear-gradient(165deg, var(--bg-top) 0%, var(--bg-mid) 48%, var(--bg-bottom) 100%);
+}
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(46px);
+  opacity: 0.6;
+  will-change: transform;
+}
+.o1 { width: 420px; height: 420px; top: -130px; left: -150px;
+  background: radial-gradient(circle at 40% 40%, var(--glow-blue), transparent 68%);
+  animation: drift 19s ease-in-out infinite alternate; }
+.o2 { width: 380px; height: 380px; right: -170px; top: 36%;
+  background: radial-gradient(circle, var(--glow-violet), transparent 68%);
+  animation: drift 23s ease-in-out infinite alternate-reverse; }
+.o3 { width: 460px; height: 460px; left: -130px; bottom: -210px;
+  background: radial-gradient(circle, #7a4dff, transparent 68%);
+  animation: drift 27s ease-in-out infinite alternate; }
+.sparkles {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 16%, #fff, transparent),
+    radial-gradient(1px 1px at 78% 10%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 90% 34%, #fff, transparent),
+    radial-gradient(1px 1px at 22% 44%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 60% 58%, #fff, transparent),
+    radial-gradient(1px 1px at 8% 72%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 84% 80%, #fff, transparent),
+    radial-gradient(1px 1px at 46% 90%, #fff, transparent),
+    radial-gradient(1px 1px at 38% 24%, #fff, transparent);
+  opacity: 0.7;
+  animation: twinkle 6s ease-in-out infinite alternate;
+}
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(40px, 30px, 0) scale(1.12); }
+}
+@keyframes twinkle {
+  from { opacity: 0.35; }
+  to { opacity: 0.85; }
+}
+
+/* Estructura */
+.app {
+  position: relative;
+  z-index: 1;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 2rem;
+}
+.screen {
+  width: 100%;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+.enter { animation: rise 0.5s ease both; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1, h2, .question {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-wrap: balance;
+}
+h1 {
+  font-size: clamp(2.6rem, 12vw, 3.6rem);
+  line-height: 1.02;
+}
+h1 em, h2 em {
+  font-style: italic;
+  color: var(--accent);
+  text-shadow: 0 0 28px rgba(190, 160, 255, 0.75);
+}
+h2 { font-size: clamp(2.2rem, 10vw, 3rem); line-height: 1.05; }
+.lede {
+  margin: 1.25rem 0 2rem;
+  max-width: 28rem;
+  color: var(--ink-soft);
+  font-size: 1.0625rem;
+}
+
+/* Botones */
+.btn, .link {
+  font: inherit;
+  cursor: pointer;
+}
+.btn {
+  min-height: 3rem;
+  padding: 0.75rem 1.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  box-shadow: 0 0 30px rgba(180, 130, 255, 0.5), 0 6px 18px rgba(8, 6, 50, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn:hover { box-shadow: 0 0 40px rgba(190, 150, 255, 0.7), 0 6px 18px rgba(8, 6, 50, 0.35); }
+.btn:active { transform: scale(0.97); }
+.link {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 0.3em;
+}
+.link:hover { color: var(--ink); }
+.btn:focus-visible, .link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Cuestionario */
+.top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+#counter {
+  flex: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.bar {
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #8fa5ff, var(--accent));
+  box-shadow: 0 0 10px rgba(200, 180, 255, 0.9);
+  transition: width 0.45s ease;
+}
+.question {
+  display: block;
+  font-size: clamp(1.8rem, 7.6vw, 2.4rem);
+  line-height: 1.14;
+  margin-bottom: 1.75rem;
+}
+textarea, .text-input {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.6rem 0 0.7rem;
+  font: inherit;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  resize: none;
+  caret-color: var(--accent);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+textarea::placeholder, .text-input::placeholder { color: rgba(245, 243, 255, 0.58); }
+textarea:focus, .text-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+  box-shadow: 0 12px 24px -16px rgba(190, 160, 255, 0.95);
+}
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 1.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+#count { margin-left: auto; font-variant-numeric: tabular-nums; }
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.actions .link[hidden] { display: block !important; visibility: hidden; }
+
+.text-input { -webkit-appearance: none; appearance: none; }
+.wall {
+  margin-top: 2.5rem;
+  padding: 1.1rem 1.25rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.wall .eyebrow { margin-bottom: 0.25rem; }
+.wall-msg { margin: 0.5rem 0 0.75rem; color: var(--ink-soft); font-size: 0.9375rem; }
+.entries {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  max-height: 18rem;
+  overflow-y: auto;
+}
+.entries li { padding: 0.7rem 0; border-top: 1px solid rgba(255, 255, 255, 0.14); }
+.entries .who {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+.entries .what { display: block; margin-top: 0.2rem; overflow-wrap: anywhere; white-space: pre-wrap; }
+.field-label {
+  display: block;
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+#intro-form .btn { margin-top: 1.25rem; }
+.note { margin: 1.25rem 0 0; font-size: 0.8125rem; color: var(--ink-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true">
+  <span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
+  <span class="sparkles"></span>
+</div>
+
+<main class="app">
+  <section id="intro" class="screen enter">
+    <p class="eyebrow">Respuesta corta</p>
+    <h1>Cuestionario del <em>mural</em></h1>
+    <p class="lede">Doce preguntas para conocerte mejor y saber qué te pareció la dinámica. No hay respuestas correctas.</p>
+    <form id="intro-form" novalidate autocomplete="off">
+      <label class="field-label" for="name">Tu primer nombre</label>
+      <input id="name" class="text-input" type="text" maxlength="40" autocomplete="off" enterkeyhint="go" placeholder="Escribe solo tu primer nombre">
+      <div class="meta"><span id="name-hint" role="status" aria-live="polite"></span></div>
+      <button type="submit" class="btn" id="start">Comenzar</button>
+      <p class="note">Tu nombre y tus respuestas se mostrarán en esta página y cualquier persona podrá verlas.</p>
+    </form>
+  </section>
+
+  <section id="quiz" class="screen" hidden>
+    <div class="top">
+      <span id="counter">1 / 12</span>
+      <div class="bar" role="progressbar" aria-label="Progreso" aria-valuemin="1" aria-valuemax="12" aria-valuenow="1"><i id="fill"></i></div>
+    </div>
+    <form id="form" novalidate autocomplete="off">
+      <div id="step" class="enter">
+        <p class="eyebrow" id="section"></p>
+        <label class="question" id="q" for="a"></label>
+        <textarea id="a" name="respuesta" rows="3" maxlength="240" enterkeyhint="next" placeholder="Escribe tu respuesta"></textarea>
+        <div class="meta"><span id="hint" role="status" aria-live="polite"></span><span id="count">0 / 240</span></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="link" id="back">Atrás</button>
+        <button type="submit" class="btn" id="next">Siguiente</button>
+      </div>
+    </form>
+    <aside class="wall" id="wall" aria-labelledby="wall-title" hidden>
+      <p class="eyebrow" id="wall-title">Respuestas a esta pregunta</p>
+      <p class="wall-msg" id="wall-msg" role="status"></p>
+      <ul class="entries" id="wall-list"></ul>
+    </aside>
+  </section>
+
+  <section id="done" class="screen" hidden>
+    <p class="eyebrow">Listo</p>
+    <h2>Gracias, <em id="who"></em></h2>
+    <p class="lede">Tu opinión nos ayuda a mejorar el mural.</p>
+    <button type="button" class="link" id="again">Empezar de nuevo</button>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+(function () {
+  var QUESTIONS = [
+    { s: "Sobre ti", t: "¿Qué es lo que más te gusta de ti mismo y por qué?" },
+    { s: "Sobre ti", t: "¿Qué cosas te hacen verdaderamente feliz?" },
+    { s: "Sobre ti", t: "¿Qué situaciones te hacen sentir triste, molesto o frustrado?" },
+    { s: "Sobre ti", t: "¿Cuál consideras que es tu mayor talento o habilidad?" },
+    { s: "Sobre ti", t: "¿Qué es lo que más valoras de una amistad?" },
+    { s: "Sobre ti", t: "¿Qué cualidad admiras más en otras personas?" },
+    { s: "Sobre ti", t: "¿Qué te gustaría que tus amigos supieran de ti?" },
+    { s: "Sobre ti", t: "¿Qué es lo más importante para ti: la familia, los amigos, el estudio, la salud o algo diferente? ¿Por qué?" },
+    { s: "Sobre ti", t: "Si pudieras cambiar algo de tu vida, ¿qué cambiarías y por qué?" },
+    { s: "Sobre ti", t: "¿Cuáles son tus principales metas para el futuro?" },
+    { s: "Sobre el mural", t: "¿Te gustó el mural? ¿Por qué?" },
+    { s: "Sobre el mural", t: "¿Entendiste la dinámica del mural? Explica qué te pareció." }
+  ];
+  // Pega aquí la configuración de tu proyecto de Firebase (Configuración del proyecto > Tus apps).
+  // Si queda vacía, el cuestionario funciona pero no guarda ni muestra respuestas.
+  var FIREBASE_CONFIG = {
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
+  };
+  var CONFIGURED = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId);
+  var db = null;
+  if (CONFIGURED) {
+    try {
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db = firebase.firestore();
+    } catch (err) {
+      db = null;
+    }
+  }
+  var TOTAL = QUESTIONS.length;
+  var answers = QUESTIONS.map(function () { return ""; });
+  var index = 0;
+  var personName = "";
+  var publicRows = [];
+  var wallState = CONFIGURED ? "loading" : "off";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var intro = $("intro"), quiz = $("quiz"), done = $("done");
+  var field = $("a"), hint = $("hint"), count = $("count"), step = $("step");
+  var backBtn = $("back"), nextBtn = $("next"), bar = document.querySelector(".bar");
+
+  function showOnly(el) {
+    [intro, quiz, done].forEach(function (s) { s.hidden = s !== el; });
+    el.classList.remove("enter");
+    void el.offsetWidth;
+    el.classList.add("enter");
+    window.scrollTo(0, 0);
+  }
+
+  function updateCount() {
+    count.textContent = field.value.length + " / 240";
+  }
+
+  function renderWall() {
+    var wall = $("wall"), list = $("wall-list"), msg = $("wall-msg");
+    wall.hidden = wallState === "off";
+    list.textContent = "";
+    var items = [];
+    if (wallState === "ok") {
+      publicRows.forEach(function (f) {
+        var text = f["p" + (index + 1)];
+        if (text) items.push({ who: f.nombre, what: text });
+      });
+    }
+    if (wallState === "loading") msg.textContent = "Cargando respuestas…";
+    else if (wallState === "error") msg.textContent = "No se pudieron cargar las respuestas.";
+    else if (wallState === "ok" && !items.length) msg.textContent = "Todavía nadie ha respondido esta pregunta.";
+    else msg.textContent = "";
+    msg.hidden = !msg.textContent;
+    items.forEach(function (it) {
+      var li = document.createElement("li");
+      var who = document.createElement("span");
+      who.className = "who";
+      who.textContent = it.who;
+      var what = document.createElement("span");
+      what.className = "what";
+      what.textContent = it.what;
+      li.appendChild(who);
+      li.appendChild(what);
+      list.appendChild(li);
+    });
+  }
+
+  var unsubscribe = null;
+  function loadPublic() {
+    if (!CONFIGURED || unsubscribe) return;
+    if (!db) { wallState = "error"; renderWall(); return; }
+    unsubscribe = db.collection("respuestas").orderBy("fecha", "desc").limit(300)
+      .onSnapshot(function (snap) {
+        publicRows = snap.docs.map(function (d) { return d.data(); });
+        wallState = "ok";
+        renderWall();
+      }, function () {
+        wallState = "error";
+        unsubscribe = null;
+        renderWall();
+      });
+  }
+
+  function render(focus) {
+    var q = QUESTIONS[index];
+    $("section").textContent = q.s;
+    $("q").textContent = q.t;
+    field.value = answers[index];
+    hint.textContent = "";
+    updateCount();
+    $("counter").textContent = (index + 1) + " / " + TOTAL;
+    $("fill").style.width = ((index + 1) / TOTAL * 100) + "%";
+    bar.setAttribute("aria-valuenow", String(index + 1));
+    backBtn.hidden = index === 0;
+    nextBtn.textContent = index === TOTAL - 1 ? "Finalizar" : "Siguiente";
+    step.classList.remove("enter");
+    void step.offsetWidth;
+    step.classList.add("enter");
+    renderWall();
+    if (focus) field.focus({ preventScroll: true });
+  }
+
+  function goNext() {
+    var value = field.value.trim();
+    if (!value) {
+      hint.textContent = "Escribe una respuesta corta para continuar.";
+      field.focus();
+      return;
+    }
+    answers[index] = value;
+    if (index < TOTAL - 1) {
+      index += 1;
+      render(true);
+    } else {
+      finish();
+    }
+  }
+
+  var sending = false;
+  var pendingRef = null;
+
+  function failSend() {
+    sending = false;
+    nextBtn.disabled = false;
+    backBtn.disabled = false;
+    nextBtn.textContent = "Reintentar";
+    hint.textContent = "No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.";
+  }
+
+  function finish() {
+    if (sending) return;
+    $("who").textContent = personName;
+    if (!CONFIGURED) { showOnly(done); return; }
+    sending = true;
+    nextBtn.disabled = true;
+    backBtn.disabled = true;
+    nextBtn.textContent = "Enviando…";
+    hint.textContent = "";
+    if (!db) { failSend(); return; }
+
+    var data = {
+      nombre: personName,
+      fecha: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    answers.forEach(function (a, i) { data["p" + (i + 1)] = a; });
+
+    // La misma referencia en cada reintento evita guardar dos veces a la misma persona.
+    if (!pendingRef) pendingRef = db.collection("respuestas").doc();
+    var slow = setTimeout(function () {
+      hint.textContent = "Está tardando. Revisa tu conexión: se enviará en cuanto haya internet.";
+    }, 10000);
+
+    pendingRef.set(data).then(function () {
+      clearTimeout(slow);
+      sending = false;
+      pendingRef = null;
+      nextBtn.disabled = false;
+      backBtn.disabled = false;
+      showOnly(done);
+    }).catch(function () {
+      clearTimeout(slow);
+      failSend();
+    });
+  }
+
+  $("intro-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var n = $("name").value.trim();
+    if (!n) {
+      $("name-hint").textContent = "Escribe tu nombre para comenzar.";
+      $("name").focus();
+      return;
+    }
+    personName = n;
+    index = 0;
+    showOnly(quiz);
+    loadPublic();
+    render(true);
+  });
+
+  $("name").addEventListener("input", function () {
+    $("name-hint").textContent = "";
+  });
+
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    goNext();
+  });
+
+  field.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      goNext();
+    }
+  });
+
+  field.addEventListener("input", function () {
+    hint.textContent = "";
+    updateCount();
+  });
+
+  backBtn.addEventListener("click", function () {
+    answers[index] = field.value.trim();
+    if (index > 0) {
+      index -= 1;
+      render(true);
+    }
+  });
+
+  $("again").addEventListener("click", function () {
+    answers = QUESTIONS.map(function () { return ""; });
+    index = 0;
+    personName = "";
+    pendingRef = null;
+    $("name").value = "";
+    showOnly(intro);
+  });
+  loadPublic();
+})();
+</script>
+</body>
+</html>
